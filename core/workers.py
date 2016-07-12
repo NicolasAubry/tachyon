@@ -17,6 +17,7 @@ from __future__ import print_function
 # Place, Suite 330, Boston, MA  02111-1307  USA
 #
 
+
 import re
 import sys
 from datetime import datetime
@@ -32,9 +33,8 @@ try:
 except ImportError:
     from urllib.parse import urlparse
 
-from core import database, conf, stats, textutils
+from core import database, conf, stats, textutils, heuristics
 from core.fetcher import Fetcher
-
 
 def compute_request_time(start_time, end_time):
     """
@@ -109,45 +109,6 @@ def handle_redirects(queued, target):
         database.fetch_queue.put(queued)
     else:
         textutils.output_debug("Bad redirect! " + str(matcher.ratio()))
-
-
-# If we can speed up this, the whole app will benefit from it.
-def test_valid_result(content, is_file=False):
-    is_valid_result = True
-
-    # Encoding edge case
-    # Must be a string to be compared to the 404 fingerprint
-    if not isinstance(content, str):
-        content = content.decode('utf-8', 'ignore')
-
-    if not len(content):
-        content = ""  # empty file, still a forged 404
-    elif len(content) < conf.file_sample_len:
-        content = content[0:len(content) - 1]
-    else:
-        content = content[0:conf.file_sample_len - 1]
-
-    # False positive cleanup for some edge cases
-    content = content.strip('\r\n ')
-
-    # Test signatures
-    for fingerprint in database.crafted_404s:
-        textutils.output_debug("Testing [" + content + "]" + " against Fingerprint: [" + fingerprint + "]")
-        matcher = SequenceMatcher(isjunk=None, a=fingerprint, b=content, autojunk=False)
-
-        textutils.output_debug("Ratio " + str(matcher.ratio()))
-
-        # This content is almost similar to a generated 404, therefore it's a 404.
-        if matcher.ratio() > 0.8:
-            textutils.output_debug("False positive detected!")
-            is_valid_result = False
-            break
-
-    # An empty file could be a proof of a hidden structure
-    if is_file and content == "":
-        is_valid_result = True
-
-    return is_valid_result
 
 
 def detect_tomcat_fake_404(content):
@@ -315,7 +276,7 @@ class TestPathExistsWorker(Thread):
                     })
                 elif response_code in conf.expected_path_responses:
                     # Compare content with generated 404 samples
-                    is_valid_result = test_valid_result(content)
+                    is_valid_result = heuristics.validate_result(content)
 
                     if is_valid_result:
                         # Test if behavior is ok.
@@ -464,7 +425,7 @@ class TestFileExistsWorker(Thread):
                     })
                 elif response_code in conf.expected_file_responses:
                     # Test if result is valid
-                    is_valid_result = test_valid_result(content, is_file=True)
+                    is_valid_result = heuristics.validate_result(content, is_file=True)
 
                     if is_valid_result:
                         # Test if behavior is ok.

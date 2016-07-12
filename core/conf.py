@@ -70,6 +70,7 @@ test_plugin = None
 plugins_only = False
 cookies = None
 allow_download = False
+similarity_ratio = 0.8
 
 # Behavioral tests
 behavior_queue_size = 5
