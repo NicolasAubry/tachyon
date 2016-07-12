@@ -42,7 +42,17 @@ from datetime import datetime
 def load_target_paths(running_path):
     """ Load the target paths in the database """
     textutils.output_info('Loading target paths')
-    database.paths += loaders.load_targets(running_path + '/data/path.lst') 
+    database.paths += loaders.load_targets(running_path + '/data/path.lst')
+
+    # Add path prefixes to every path
+    additions = list()
+    for path in database.paths:
+        for prefix in conf.path_prefixes:
+            new_path = path.copy()
+            new_path['url'] = new_path['url'].replace('/', '/' + prefix, 1)
+            additions.append(new_path)
+    database.paths = database.paths + additions
+
 
 def load_target_files(running_path):
     """ Load the target files in the database """

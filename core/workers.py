@@ -209,7 +209,7 @@ class FetchCrafted404Worker(Thread):
                             handle_redirects(queued, location)
 
                 # Stats
-                if response_code not in conf.timeout_codes:
+                if response_code not in conf.timeout_codes + conf.redirect_codes:
                     stats.update_processed_items()
                     compute_request_time(start_time, end_time)
 
@@ -381,7 +381,7 @@ class TestPathExistsWorker(Thread):
                             handle_redirects(queued, location + url)
 
                 # Stats
-                if response_code not in conf.timeout_codes:
+                if response_code not in conf.timeout_codes + conf.redirect_codes:
                     stats.update_processed_items()
                     compute_request_time(start_time, end_time)
 
