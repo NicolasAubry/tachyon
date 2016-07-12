@@ -58,9 +58,7 @@ def _compare_with_saved_404(content, is_file):
             textutils.output_debug("False positive detected!")
             return False
 
-    # An empty file could be a proof of a hidden structure
-    if is_file and content == "":
-        return True
+    return True
 
 
 def _verify_excluded_patterns(url, is_file):

@@ -31,6 +31,8 @@
 {"url" : "/archives", "description" : "Archive directory", "severity" : "warning"}
 {"url" : "/backup", "description" : "Backup directory", "severity" : "medium"}
 {"url" : "/backups", "description" : "Backup directory", "severity" : "medium"}
+{"url" : "/backup-sql", "description" : "Database backup directory", "severity" : "warning"}
+{"url" : "/backup-db", "description" : "Database backup directory", "severity" : "warning"}
 {"url" : "/bar", "description" : "Random directory", "severity" : "info"}
 {"url" : "/board", "description" : "Forum directory", "severity" : "info"}
 {"url" : "/bulksms", "description" : "Sms Spam system", "severity" : "warning"}
@@ -101,11 +103,13 @@
 {"url" : "/modules", "description" : "Modules directory", "severity" : "info"}
 {"url" : "/nagios", "description" : "Nagios monitoring", "severity" : "warning"}
 {"url" : "/old", "description" : "Old website version", "severity" : "warning"}
+{"url" : "/pdf", "description" : "PDF storage directory", "severity" : "info"}
 {"url" : "/piwik", "description" : "Piwik analytics platform", "severity" : "info"}
 {"url" : "/private", "description" : "Private directory", "severity" : "info"}
 {"url" : "/protected", "description" : "_Protected_ directory", "severity" : "info"}
 {"url" : "/pub", "description" : "Public directory", "severity" : "info"}
 {"url" : "/public", "description" : "Public directory", "severity" : "info"}
+{"url" : "/public_html", "description" : "Default web content directory", "severity" : "info"}
 {"url" : "/photo", "description" : "Photos directory", "severity" : "info"}
 {"url" : "/photos", "description" : "Photos directory", "severity" : "info"}
 {"url" : "/random", "description" : "Random stuff directory", "severity" : "info"}
@@ -150,11 +154,13 @@
 {"url" : "/webmail", "description" : "Webmail directory", "severity" : "info"}
 {"url" : "/webedit", "description" : "Admin directory", "severity" : "warning"}
 {"url" : "/work", "description" : "work directory", "severity" : "warning"}
+{"url" : "/www", "description" : "Default web content directory", "severity" : "info"}
 {"url" : "/WEB-INF", "description" : "web-inf directory", "severity" : "warning"}
 {"url" : "/META-INF", "description" : "meta-inf directory", "severity" : "warning"}
 {"url" : "/wp-admin", "description" : "Wordpress admin section", "severity" : "info"}
 {"url" : "/xml", "description" : "Static xml directory", "severity" : "info"}
-
+{"url" : "/wp-content", "description" : "Wordpress content directory", "severity" : "info"}
+{"url" : "/wp-content/uploads", "description" : "Wordpress user uploads directory", "severity" : "info"}
 
 # Drupal
 {"url" : "/sites/default/files/backup_migrate", "description" : "Drupal Migrations", "severity" : "critical"}

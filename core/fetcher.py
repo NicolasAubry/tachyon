@@ -24,6 +24,8 @@ class Fetcher(object):
     def fetch_url(self, url, user_agent, timeout, limit_len=True, add_headers=dict()):
         """ Fetch a given url, with a given user_agent and timeout"""
         response = None
+        content = None
+        headers= None
         try:
             if not add_headers.get('User-Agent'):
                 add_headers['User-Agent'] = user_agent
@@ -66,7 +68,9 @@ class Fetcher(object):
             response.release_conn()  # return the connection back to the pool
         except Exception as e:
             code = 0
-            content = ''
-            headers = dict()
+            if not content:
+                content = ''
+            if not headers:
+                headers = dict()
 
         return code, content, headers

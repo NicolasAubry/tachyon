@@ -94,9 +94,9 @@ def handle_redirects(queued, target):
     elif not retry_count:
         queued['retries'] = 0
 
+
     parsed_taget = urlparse(target)
     target_path = parsed_taget.path
-
     source_path = conf.target_base_path + queued.get('url')
     textutils.output_debug("Handling redirect from: " + source_path + " to " + target_path)
 
@@ -113,7 +113,7 @@ def handle_redirects(queued, target):
 
 def detect_tomcat_fake_404(content):
     """ An apache setup will issue a 404 on an existing path if theres a tomcat trying to handle jsp on the same host """
-    if content.find(b'Apache Tomcat/') != -1:
+    if content.find('Apache Tomcat/') != -1:
         return True
 
     return False
@@ -249,13 +249,16 @@ class TestPathExistsWorker(Thread):
                 # Fetch directory
                 start_time = datetime.now()
                 response_code, content, headers = self.fetcher.fetch_url(url, conf.user_agent, database.latest_successful_request_time, limit_len=False)
+
+                if not isinstance(content, str):
+                    content = content.decode('utf-8', 'ignore')
+
                 end_time = datetime.now()
 
                 # Fetch '/' but don't submit it to more logging/existance tests
                 if queued.get('url') == '/':
                     if queued not in database.valid_paths:
                         database.valid_paths.append(queued)
-
                     database.fetch_queue.task_done()
                     continue
 
@@ -356,18 +359,26 @@ class TestPathExistsWorker(Thread):
                                 "severity": queued.get('severity'),
                             })
                         else:
-                            textutils.output_found(description + ' at: ' + conf.base_url + url, {
-                                "description": description,
-                                "url": conf.base_url + url,
-                                "code": response_code,
-                                "severity": queued.get('severity'),
-                            })
+                            if "parent directory" in content.lower():
+                                textutils.output_found("World readable " + description + ' at: ' + conf.base_url + url, {
+                                    "description": "World readable " + description,
+                                    "url": conf.base_url + url,
+                                    "code": response_code,
+                                    "severity": "critical",
+                                })
+                            else:
+                                textutils.output_found(description + ' at: ' + conf.base_url + url, {
+                                    "description": description,
+                                    "url": conf.base_url + url,
+                                    "code": response_code,
+                                    "severity": queued.get('severity'),
+                                })
 
                 elif response_code in conf.redirect_codes:
                     if queued.get('handle_redirect', True):
                         location = headers.get('location')
                         if location:
-                            handle_redirects(queued, location)
+                            handle_redirects(queued, location + url)
 
                 # Stats
                 if response_code not in conf.timeout_codes:
