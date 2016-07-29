@@ -20,12 +20,12 @@ from collections import defaultdict
 
 # Internal config and consts
 name = "delvelabs/tachyon"
-version = '2.3.4'
+version = '2.2.2'
 expected_path_responses = [200, 206, 401, 403]
 expected_file_responses = [200, 206]
 timeout_codes = [0, 500, 502, 503, 504]
 redirect_codes = [301, 302, 303, 307]
-file_sample_len = 5120
+file_sample_len = 2048
 
 # Templates, used by plugins
 path_template = {'url': '', 'timeout_count': 0, 'description': ''}
@@ -34,17 +34,17 @@ path_template = {'url': '', 'timeout_count': 0, 'description': ''}
 crafted_404_extensions = ['', '.php', '.jsp', '.asp', '.html', '.rb', '.js', '.py']
 
 # Values used to generate file list (maybe this sould be configurable)
-file_suffixes = ['', '.sql', '.bak', '-bak', '.old', '-old', '.dmp', '.dump', '.db', '.zip', '.rar', '.7z',
-                '.tar.gz', '.tar.bz2', '.tar', '.tgz', '~', '.conf.old', '.conf', '.config',
-                '.conf.orig', '.conf.bak', '.cnf', '.cfg', '.ini', '.inc', '.inc.old', '.inc.orig', '.log', '.txt', '_log',
-                '.passwd', '.php.bak', '.php.old', '.php.inc', '.php.orig', '.sql.old', '.sql.bak', '0', '1', '2', '.xml',
-                '.csv', '.wsdl', '.pwd']
+file_suffixes = ['', '-bak', '-old', '.7z', '.bak', '.cfg', '.cnf', '.conf', '.conf.bak', '.conf.old', '.conf.orig', 
+                '.config', '.csv', '.dmp', '.dump', '.inc', '.inc.old', '.inc.orig', '.ini', '.json', '.log', '.old', 
+                '.passwd', '.php.bak', '.php.inc', '.php.old', '.php.orig', '.properties', '.pwd', '.rar', '.sql', 
+                '.sql.bak', '.sql.old', '.tar', '.tar.bz2', '.tar.gz', '.tgz', '.txt', '.wsdl', '.xml', '.yml', '.zip', 
+                '0', '1', '2', '_log', '~']
 
 # Values used to generate executable file lookup
 executables_suffixes = ['.php', '.asp', '.aspx', '.pl', '.cgi', '.cfm', '.rb', '.py']
 
 # prefixes added to each path
-path_prefixes = ['-', '~']
+path_prefixes = ['.', '-', '~']
 
 # User config
 target_host = ''
@@ -63,7 +63,6 @@ fetch_timeout_secs = 2
 max_timeout_secs = 15
 max_timeout_count = 500
 thread_count = 250
-use_tor = False
 eval_output = False
 user_agent = 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36' # maximum compatibility
 files_only = False

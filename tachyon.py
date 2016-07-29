@@ -28,7 +28,7 @@ if sys.version_info[0] < 3:
 import uuid
 import urllib3
 import os
-from core import conf, database, dnscache, loaders, textutils, netutils, dbutils
+from core import conf, database, dnscache, loaders, textutils, netutils, dbutils, heuristics
 from core.fetcher import Fetcher
 from core.workers import PrintWorker, PrintResultsWorker, JSONPrintResultWorker, FetchCrafted404Worker, TestPathExistsWorker, TestFileExistsWorker
 from core.threads import ThreadManager
@@ -47,17 +47,19 @@ def load_target_paths(running_path):
     # Add path prefixes to every path
     additions = list()
     for path in database.paths:
-        for prefix in conf.path_prefixes:
-            new_path = path.copy()
-            new_path['url'] = new_path['url'].replace('/', '/' + prefix, 1)
-            additions.append(new_path)
-    database.paths = database.paths + additions
+        if path['url'] != '/':
+            for prefix in conf.path_prefixes:
+                new_path = path.copy()
+                new_path['url'] = new_path['url'].replace('/', '/' + prefix, 1)
+                additions.append(new_path)
+            database.paths = database.paths + additions
 
 
 def load_target_files(running_path):
     """ Load the target files in the database """
     textutils.output_info('Loading target files')
     database.files += loaders.load_targets(running_path + '/data/file.lst')
+
 
 def get_session_cookies():
     """ Fetch initial session cookies """
@@ -78,7 +80,8 @@ def sample_root_404():
     """ Get the root 404, this has to be done as soon as possible since plugins could use this information. """
     manager = ThreadManager()
     textutils.output_info('Benchmarking root 404')
-    
+
+    # Bench different extensions
     for ext in conf.crafted_404_extensions:
         random_file = str(uuid.uuid4())
         path = conf.path_template.copy()
@@ -91,6 +94,13 @@ def sample_root_404():
         # Were not using the fetch cache for 404 sampling
         database.fetch_queue.put(path)
 
+    # Bench path prefixes
+    for prefix in conf.path_prefixes:
+        random_path = str(uuid.uuid4())
+        path = conf.path_template.copy()
+        path['url'] = '/' + prefix + random_path + '/'
+        database.fetch_queue.put(path)
+
     # Forced bogus path check
     random_file = str(uuid.uuid4())
     path = conf.path_template.copy()
@@ -101,6 +111,37 @@ def sample_root_404():
 
     workers = manager.spawn_workers(len(conf.crafted_404_extensions), FetchCrafted404Worker)
     manager.wait_for_idle(workers, database.fetch_queue)
+
+
+def run_preliminary_path_heuristics():
+    """
+    Tries to determine any bogus behavior of the remote server and remove the problematic entries from the fetch list
+    """
+    textutils.output_info("Running some heuristics")
+    if heuristics.test_bogus_source_control_catch():
+        #.hg.git / svn
+        pass
+
+    if heuristics.test_bogus_dot_path_catch():
+        pass
+
+    if heuristics.test_bogus_dash_path_catch():
+        pass
+
+    if heuristics.test_bogus_tilde_path_catch():
+        pass
+
+
+def run_preliminary_file_heuristics():
+    """
+    Tries to determine any bogus behavior of the remote server and remove the problematic entries from the fetch list
+    """
+
+    if heuristics.test_bogus_apache_dot_files():
+        pass
+
+    if heuristics.test_bogus_global_dot_files():
+        pass
 
 
 def test_paths_exists():
@@ -310,7 +351,6 @@ if __name__ == "__main__":
     textutils.output_debug('Max timeouts per url: ' + str(conf.max_timeout_count))
     textutils.output_debug('Worker threads: ' + str(conf.thread_count))
     textutils.output_debug('Target Host: ' + str(conf.target_host))
-    textutils.output_debug('Using Tor: ' + str(conf.use_tor))
     textutils.output_debug('Eval-able output: ' + str(conf.eval_output))
     textutils.output_debug('JSON output: ' + str(conf.json_output))
     textutils.output_debug('Using User-Agent: ' + str(conf.user_agent))
@@ -321,12 +361,7 @@ if __name__ == "__main__":
         textutils.output_debug('Using proxy: ' + str(conf.proxy_url))
 
     textutils.output_info('Starting Discovery on ' + conf.base_url)
-    
-    if conf.use_tor:
-        textutils.output_info('Using Tor, be patient it WILL be slow!')
-        textutils.output_info('Max timeout count and url fetch timeout doubled for the occasion ;)')
-        conf.max_timeout_count *= 2
-        conf.fetch_timeout_secs *= 2
+
 
     # Handle keyboard exit before multi-thread operations
     print_results_worker = None
@@ -386,12 +421,14 @@ if __name__ == "__main__":
             sample_404_from_found_path()
             add_files_to_paths()
             load_execute_file_plugins()
+            print_results_worker.start()
+            # Heuristics
+            run_preliminary_file_heuristics()
             textutils.output_info('Probing ' + str(len(database.valid_paths)) + ' files')
             database.messages_output_queue.join()
             # Start print result worker.
             print_results_worker = SelectedPrintWorker()
             print_results_worker.daemon = True
-            print_results_worker.start()
             test_file_exists()
         elif conf.directories_only:
             get_session_cookies()
@@ -402,10 +439,13 @@ if __name__ == "__main__":
             database.paths.append(root_path)
             database.valid_paths.append(root_path)
             load_execute_host_plugins()
+            sample_404_from_found_path()
             print_results_worker = SelectedPrintWorker()
             print_results_worker.daemon = True
             print_results_worker.start()
             load_target_paths(running_path)
+            # Heuristics
+            run_preliminary_path_heuristics()
             test_paths_exists()
         elif conf.plugins_only:
             get_session_cookies()
@@ -427,12 +467,15 @@ if __name__ == "__main__":
             load_target_files(running_path)
             # Execute all Host plugins
             load_execute_host_plugins()
+            # Heuristics on paths
+            run_preliminary_path_heuristics()
             test_paths_exists()
-            textutils.output_info('Sampling 404 for new paths')
             sample_404_from_found_path()
             textutils.output_info('Generating file targets')
             add_files_to_paths()
             load_execute_file_plugins()
+            # Heuristics on files
+            run_preliminary_file_heuristics()
             textutils.output_info('Probing ' + str(len(database.valid_paths)) + ' files')
             database.messages_output_queue.join()
             print_results_worker = SelectedPrintWorker()

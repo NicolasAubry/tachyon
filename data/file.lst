@@ -40,6 +40,9 @@
 {"url" : "ccbill", "description" : "CCBill.com logs", "severity" : "critical"}
 {"url" : "fckeditor", "description" : "CkEditor", "severity" : "medium"}
 {"url" : "config", "description" : "Config file", "severity" : "critical"}
+{"url" : "configure", "description" : "Config file", "severity" : "critical"}
+{"url" : "configuration", "description" : "Config file", "severity" : "critical"}
+{"url" : "_config", "description": "Config file", "severity" : "medium"}
 {"url" : "conf", "description" : "Config file", "severity" : "critical"}
 {"url" : "common", "description" : "Config file", "severity" : "medium"}
 {"url" : "cron", "description" : "crontab file", "severity" : "medium"}
@@ -50,16 +53,21 @@
 {"url" : "database", "description" : "database backup", "severity" : "critical"}
 {"url" : "db", "description" : "database backup", "severity" : "critical"}
 {"url" : "default", "description" : "default file", "severity" : "info"}
+{"url" : "debug", "description": "Generic debug file", "severity" : "medium"}
 {"url" : "deploy", "description" : "Site backup", "severity" : "warning"}
 {"url" : "digest", "description" : "digest file", "severity" : "info"}
 {"url" : "dokuwiki", "description" : "Dokuwiki backup", "severity" : "warning"}
+{"url" : "dump", "description": "Generic dump file", "severity" : "medium"}
 {"url" : "encrypt", "description" : "encryption file", "severity" : "warning"}
 {"url" : "error", "description" : "error log", "severity" : "medium"}
 {"url" : "errors", "description" : "errors log", "severity" : "warning"}
 {"url" : "export", "description" : "database backup", "severity" : "warning"}
 {"url" : "foo", "description" : "random backup", "severity" : "info"}
 {"url" : "files", "description" : "files reference", "severity" : "warning"}
+{"url" : "ftp", "description" : "Ftp file", "severity" : "warning"}
 {"url" : "global", "description" : "global settings", "severity" : "warning"}
+{"url" : "_gateways", "description": "Config file", "severity" : "medium"}
+{"url" : "_glynn", "description": "Config file", "severity" : "medium"}
 {"url" : ".htaccess", "description" : "htacces file", "no_suffix": True, "severity" : "medium"}
 {"url" : ".hta", "description" : "htacces file", "no_suffix": True, "severity" : "medium"}
 {"url" : ".htpasswd", "description" : "htpasswd file", "no_suffix": True, "severity" : "critical"}
@@ -86,6 +94,8 @@
 {"url" : "memcached", "description" : "memcached monitoring", "severity" : "warning"}
 {"url" : "note", "description" : "notes file", "severity" : "warning"}
 {"url" : "notes", "description" : "notes file", "severity" : "warning"}
+{"url" : "out", "description": "Generic output file", "severity" : "medium"}
+{"url" : "output", "description": "Generic output file", "severity" : "medium"}
 {"url" : "pass", "description" : "Password file", "severity" : "critical"}
 {"url" : "password", "description" : "password file", "severity" : "critical"}
 {"url" : "passwords", "description" : "password file", "severity" : "critical"}
@@ -95,18 +105,25 @@
 {"url" : "proftpd", "description" : "ProFTPD config", "severity" : "warning"}
 {"url" : "pixelpost", "description" : "Pixelpost config", "severity" : "info"}
 {"url" : "pmwiki", "description" : "pmwiki file", "severity" : "info"}
+{"url" : "preferences", "description": "Generic preferences file", "severity" : "medium"}
 {"url" : "putty", "description" : "PuTTY logs", "severity" : "warning"}
 {"url" : "putty.reg", "description" : "PuTTY logs", "no_suffix": True, "severity" : "critical"}
 {"url" : "register", "description" : "Register file", "severity" : "info"}
+{"url" : "resource", "description" : "Resource file", "severity" : "info"}
 {"url" : "redis", "description" : "redis monitoring", "severity" : "info"}
 {"url" : "rsync", "description" : "Remote sync file", "severity" : "info"}
+{"url" : "secret", "description" : "Secret file", "severity" : "warning"}
 {"url" : "service", "description" : "Password file", "severity" : "info"}
 {"url" : "server", "description" : "server file", "severity" : "info"}
 {"url" : "settings", "description" : "settings file", "severity" : "medium"}
 {"url" : "site", "description" : "database backup", "severity" : "info"}
 {"url" : "stats", "description" : "statistic file", "severity" : "warning"}
+{"url" : "system", "description" : "system file", "severity" : "medium"}
 {"url" : "test", "description" : "test dir/file", "severity" : "warning"}
+{"url" : "tests", "description" : "test dir/file", "severity" : "warning"}
+{"url" : "testing", "description" : "test dir/file", "severity" : "warning"}
 {"url" : "test_db", "description" : "database backup", "severity" : "medium"}
+{"url" : ".travis", "description": "Travis CI Config file", "severity" : "medium"}
 {"url" : "transactions", "description" : "transactions log", "severity" : "critical"}
 {"url" : "transaction", "description" : "transactions log", "severity" : "critical"}
 {"url" : "user", "description" : "username file", "severity" : "medium"}
@@ -118,6 +135,7 @@
 {"url" : "xmlrpc.php", "description" : "Website API", "no_suffix": True, "severity" : "info"}
 {"url" : "xml-rpc", "description" : "Website API", "severity" : "info"}
 {"url" : "rpc", "description" : "Website API", "severity" : "info"}
+{"url" : "strings", "description": "Generic strings file", "severity" : "medium"}
 {"url" : "json", "description" : "Website API", "severity" : "info"}
 {"url" : "json-api", "description" : "Website API", "severity" : "info"}
 {"url" : "web", "description" : "Web file", "severity" : "warning"}
@@ -230,3 +248,15 @@
 {"url": "shell", "description": "Common backdoor", "type" : "malware", "severity" : "critical"}
 {"url": "backdoor", "description": "Common backdoor", "type" : "malware", "severity" : "critical"}
 {"url": "cmd", "description": "Common backdoor", "type" : "malware", "severity" : "critical"}
+
+
+# Docker
+{"url": "docker-compose", "description": "Docker compose config file", "severity" : "medium"}
+{"url": "Dockerfile", "description": "Docker container config", "no_suffix": True, "severity" : "critical"}
+
+
+
+
+
+
+

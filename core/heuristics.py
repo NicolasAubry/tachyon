@@ -15,16 +15,24 @@
 # this program; if not, write to the Free Software Foundation, Inc., 59 Temple
 # Place,
 
+try:
+    from urllib import quote_plus
+except ImportError:
+    from urllib.parse import quote_plus
+
 from core import database, textutils, conf
 from difflib import SequenceMatcher
+from core.fetcher import Fetcher
+
+fetcher = Fetcher()
 
 
-def validate_result(content, is_file=False):
-    formatted_content = _get_formatted_content(content)
+def validate_result(content, url, is_file=False):
+    formatted_content = _get_formatted_content(content, url)
     return _compare_with_saved_404(formatted_content, is_file)
 
 
-def _get_formatted_content(content):
+def _get_formatted_content(content, url):
     """
     Manage content decoding and conf-specified len trimming
     """
@@ -32,6 +40,10 @@ def _get_formatted_content(content):
     # Decode to utf-8, stripping unknown caracters
     if not isinstance(content, str):
         content = content.decode('utf-8', 'ignore')
+
+    # Clean up request url from content
+    content = content.strip(quote_plus(url))
+    content = content.strip(url)  # for unsafe sites
 
     if not len(content):
         content = ""  # empty content could mean something
@@ -68,3 +80,32 @@ def _verify_excluded_patterns(url, is_file):
     pass
 
 
+
+# Test different edge cases
+def test_bogus_source_control_catch():
+    #.hg #.git
+    pass
+
+
+def test_bogus_dot_path_catch():
+    pass
+
+
+def test_bogus_dash_path_catch():
+    pass
+
+
+def test_bogus_tilde_path_catch():
+    pass
+
+
+def test_bogus_apache_dot_files():
+    pass
+
+
+def test_bogus_global_dot_files():
+    pass
+
+
+def test_bogus_forbidden_catch_all():
+    pass

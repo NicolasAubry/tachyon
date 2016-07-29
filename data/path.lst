@@ -43,6 +43,7 @@
 {"url" : "/code", "description" : "source code directory", "severity" : "warning"}
 {"url" : "/common", "description" : "common content directory", "severity" : "info"}
 {"url" : "/config", "description" : "Config directory", "severity" : "warning"}
+{"url" : "/configs", "description" : "Config directory", "severity" : "warning"}
 {"url" : "/configuration", "description" : "Config directory", "severity" : "warning"}
 {"url" : "/content", "description" : "Static content directory", "severity" : "info"}
 {"url" : "/cp", "description" : "Control panel", "severity" : "warning"}
@@ -74,6 +75,7 @@
 {"url" : "/ftp", "description" : "Ftp directory", "severity" : "warning"}
 {"url" : "/forum", "description" : "Forum directory", "severity" : "info"}
 {"url" : "/foo", "description" : "Random directory", "severity" : "info"}
+{"url" : "/forbidden", "description" : "Forbidden directory", "severity" : "info"}
 {"url" : "/groupware", "description" : "Groupware directory", "severity" : "info"}
 {"url" : "/gui", "description" : "GUI / uTorrent Web GUI", "severity" : "info"}
 {"url" : "/img", "description" : "Images directory", "severity" : "info"}
@@ -124,9 +126,11 @@
 {"url" : "/sites", "description" : "Subsites directory", "severity" : "info"}
 {"url" : "/slimstat", "description" : "SlimStats", "severity" : "warning"}
 {"url" : "/src", "description" : "Source directory", "severity" : "warning"}
-{"url" : "/.ssh", "description" : "SSH config directory", "severity" : "medium"}
+# no leading dot since "." is in auto-prefix
+{"url" : "/ssh", "description" : "SSH config directory", "severity" : "medium"}
 {"url" : "/safe", "description" : "_Safe_ directory", "severity" : "info"}
 {"url" : "/shop", "description" : "Shop directory", "severity" : "info"}
+{"url" : "/share", "description" : "User share directory", "severity" : "medium"}
 {"url" : "/static", "description" : "Static files directory", "severity" : "info"}
 {"url" : "/stats", "description" : "Stats directory", "severity" : "info"}
 {"url" : "/status", "description" : "Stats directory", "severity" : "info"}
@@ -148,7 +152,8 @@
 {"url" : "/users", "description" : "User directory", "severity" : "info"}
 {"url" : "/utils", "description" : "Utils directory", "severity" : "info"}
 {"url" : "/var", "description" : "Variable directory", "severity" : "info"}
-{"url" : "/.vim", "description" : "Vim config directory", "severity" : "medium"}
+# no leading dot since "." is in auto-prefix
+{"url" : "/vim", "description" : "Vim config directory", "severity" : "medium"}
 {"url" : "/webadmin", "description" : "Admin section", "severity" : "info"}
 {"url" : "/webadm", "description" : "Admin section", "severity" : "info"}
 {"url" : "/webmail", "description" : "Webmail directory", "severity" : "info"}
@@ -159,6 +164,7 @@
 {"url" : "/META-INF", "description" : "meta-inf directory", "severity" : "warning"}
 {"url" : "/wp-admin", "description" : "Wordpress admin section", "severity" : "info"}
 {"url" : "/xml", "description" : "Static xml directory", "severity" : "info"}
+{"url" : "/webmaster", "description" : "Webmaster directory", "severity" : "info"}
 {"url" : "/wp-content", "description" : "Wordpress content directory", "severity" : "info"}
 {"url" : "/wp-content/uploads", "description" : "Wordpress user uploads directory", "severity" : "info"}
 
@@ -183,8 +189,10 @@
 # Source control directory
 # /.svn omited since theres a plugin to manage it
 {"url" : "/CVS", "description" : "CVS directory", "severity" : "critical"}
-{"url" : "/.git", "description" : "Git directory", "severity" : "critical"}
-{"url" : "/.hg", "description" : "Mercurial directory", "severity" : "critical"}
+# no leading dot since "." is in auto-prefix
+{"url" : "/git", "description" : "Git directory", "severity" : "critical"}
+# no leading dot since "." is in auto-prefix
+{"url" : "/hg", "description" : "Mercurial directory", "severity" : "critical"}
 
 # Tomcat
 {"url" : "/manager/html", "description" : "Tomcat manager", "severity" : "medium"}

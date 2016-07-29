@@ -20,6 +20,7 @@ from __future__ import print_function
 
 import re
 import sys
+
 from datetime import datetime
 from difflib import SequenceMatcher
 from threading import Thread
@@ -32,6 +33,11 @@ try:
     from urlparse import urlparse
 except ImportError:
     from urllib.parse import urlparse
+
+try:
+    from urllib import quote_plus
+except ImportError:
+    from urllib.parse import quote_plus
 
 from core import database, conf, stats, textutils, heuristics
 from core.fetcher import Fetcher
@@ -191,6 +197,11 @@ class FetchCrafted404Worker(Thread):
                     if not isinstance(content, str):
                         content = content.decode('utf-8', 'ignore')
 
+                    # Strip the url from the content to avoid getting fooled by content traps or
+                    # creative redirect functions
+                    content = content.strip(quote_plus(url))
+                    content = content.strip(url)  # for unsafe sites
+
                     # The server responded with whatever code but 404 or invalid stuff (500). We take a sample
                     if len(content) < conf.file_sample_len:
                         crafted_404 = content[0:len(content) - 1]
@@ -279,7 +290,7 @@ class TestPathExistsWorker(Thread):
                     })
                 elif response_code in conf.expected_path_responses:
                     # Compare content with generated 404 samples
-                    is_valid_result = heuristics.validate_result(content)
+                    is_valid_result = heuristics.validate_result(content, url)
 
                     if is_valid_result:
                         # Test if behavior is ok.
@@ -436,7 +447,7 @@ class TestFileExistsWorker(Thread):
                     })
                 elif response_code in conf.expected_file_responses:
                     # Test if result is valid
-                    is_valid_result = heuristics.validate_result(content, is_file=True)
+                    is_valid_result = heuristics.validate_result(content, url, is_file=True)
 
                     if is_valid_result:
                         # Test if behavior is ok.
@@ -456,6 +467,9 @@ class TestFileExistsWorker(Thread):
                         if not database.behavior_error:
                             textutils.output_info('Behavior change detected! Results may '
                                                   'be incomplete or tachyon may never exit.')
+
+                            textutils.output_info(repr(database.behavioral_buffer[0]))
+                            textutils.output_info("C404 " + repr(database.crafted_404s))
                             textutils.output_debug('Chances taken: ' + str(queued.get('behavior_chances', 0)))
                             textutils.output_debug(queued.get('url'))
                             database.behavior_error = True
