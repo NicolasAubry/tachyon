@@ -39,6 +39,7 @@ def execute():
     new_target = conf.path_template.copy()
     new_target['url'] = target
     new_target['description'] = "HostProcessor generated filename"
+    new_target['codes'] = conf.expected_file_responses.copy()
     database.files.append(new_target)
     textutils.output_debug(" - HostProcessor Plugin added: " + str(new_target))
     added += 1
@@ -48,6 +49,7 @@ def execute():
     new_target = conf.path_template.copy()
     new_target['url'] = target
     new_target['description'] = "HostProcessor generated filename"
+    new_target['codes'] = conf.expected_file_responses.copy()
     database.files.append(new_target)
     textutils.output_debug(" - HostProcessor Plugin added: " + str(new_target))
     added += 1
@@ -58,6 +60,7 @@ def execute():
     new_target = conf.path_template.copy()
     new_target['url'] = nodom_target
     new_target['description'] = "HostProcessor generated filename"
+    new_target['codes'] = conf.expected_file_responses.copy()
     database.files.append(new_target)
     textutils.output_debug(" - HostProcessor Plugin added: " + str(new_target))
     added += 1
@@ -75,18 +78,21 @@ def execute():
 
         new_target['url'] = short_dom
         new_target['description'] = "HostProcessor generated filename"
+        new_target['codes'] = conf.expected_file_responses.copy()
         database.files.append(new_target)
         textutils.output_debug(" - HostProcessor Plugin added: " + str(new_target))
         added += 1
         
         new_target = new_target.copy()
         new_target['url'] = short_dom + 'admin'
+        new_target['codes'] = conf.expected_file_responses.copy()
         database.files.append(new_target)
         textutils.output_debug(" - HostProcessor Plugin added: " + str(new_target))
         added += 1
         
         new_target = new_target.copy()
         new_target['url'] = short_dom + '-admin'
+        new_target['codes'] = conf.expected_file_responses.copy()
         database.files.append(new_target)
         textutils.output_debug(" - HostProcessor Plugin added: " + str(new_target))
         added += 1
@@ -96,6 +102,7 @@ def execute():
     new_target = conf.path_template.copy()
     new_target['url'] = target
     new_target['description'] = "HostProcessor generated filename"
+    new_target['codes'] = conf.expected_file_responses.copy()
     database.files.append(new_target)
     textutils.output_debug(" - HostProcessor Plugin added: " + str(new_target))
     added += 1

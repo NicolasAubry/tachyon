@@ -42,7 +42,10 @@ from datetime import datetime
 def load_target_paths(running_path):
     """ Load the target paths in the database """
     textutils.output_info('Loading target paths')
-    database.paths += loaders.load_targets(running_path + '/data/path.lst')
+    paths = loaders.load_targets(running_path + '/data/path.lst')
+    for path in paths:
+        path['codes'] = conf.expected_path_responses.copy()
+    database.paths += paths
 
     # Add path prefixes to every path
     additions = list()
@@ -51,6 +54,7 @@ def load_target_paths(running_path):
             for prefix in conf.path_prefixes:
                 new_path = path.copy()
                 new_path['url'] = new_path['url'].replace('/', '/' + prefix, 1)
+                new_path['codes'] = conf.expected_path_responses.copy()
                 additions.append(new_path)
             database.paths = database.paths + additions
 
@@ -58,7 +62,10 @@ def load_target_paths(running_path):
 def load_target_files(running_path):
     """ Load the target files in the database """
     textutils.output_info('Loading target files')
-    database.files += loaders.load_targets(running_path + '/data/file.lst')
+    files = loaders.load_targets(running_path + '/data/file.lst')
+    for afile in files:
+        afile['codes'] = conf.expected_file_responses.copy()
+    database.files += files
 
 
 def get_session_cookies():
@@ -66,6 +73,7 @@ def get_session_cookies():
     textutils.output_info('Fetching session cookie')
     path = conf.path_template.copy()
     path['url'] = '/'
+    path['codes'] = conf.expected_path_responses.copy()
 
     # Were not using the fetch cache for session cookie sampling
     fetcher = Fetcher()
@@ -91,6 +99,7 @@ def sample_root_404():
         else:
             path['url'] = random_file + ext
 
+        path['codes'] = conf.expected_path_responses.copy()
         # Were not using the fetch cache for 404 sampling
         database.fetch_queue.put(path)
 
@@ -99,12 +108,14 @@ def sample_root_404():
         random_path = str(uuid.uuid4())
         path = conf.path_template.copy()
         path['url'] = '/' + prefix + random_path + '/'
+        path['codes'] = conf.expected_path_responses.copy()
         database.fetch_queue.put(path)
 
     # Forced bogus path check
     random_file = str(uuid.uuid4())
     path = conf.path_template.copy()
     path['url'] = '/' + random_file + '/'
+    path['codes'] = conf.expected_path_responses.copy()
 
     # Were not using the fetch cache for 404 sampling
     database.fetch_queue.put(path)
@@ -118,30 +129,31 @@ def run_preliminary_path_heuristics():
     Tries to determine any bogus behavior of the remote server and remove the problematic entries from the fetch list
     """
     textutils.output_info("Running some heuristics")
-    if heuristics.test_bogus_source_control_catch():
+    #if heuristics.test_bogus_source_control_catch():
         #.hg.git / svn
-        pass
+    #    pass
 
-    if heuristics.test_bogus_dot_path_catch():
-        pass
+   # if heuristics.test_bogus_dot_path_catch():
+    #    pass
 
-    if heuristics.test_bogus_dash_path_catch():
-        pass
-
-    if heuristics.test_bogus_tilde_path_catch():
-        pass
-
+    #if heuristics.test_bogus_dash_path_catch():
+     #   pass
+#
+   # if heuristics.test_bogus_tilde_path_catch():
+    #    pass
+    pass
 
 def run_preliminary_file_heuristics():
     """
     Tries to determine any bogus behavior of the remote server and remove the problematic entries from the fetch list
     """
 
-    if heuristics.test_bogus_apache_dot_files():
-        pass
+   # if heuristics.test_bogus_apache_dot_files():
+    #    pass
 
-    if heuristics.test_bogus_global_dot_files():
-        pass
+   # if heuristics.test_bogus_global_dot_files():
+      #  pass
+    pass
 
 
 def test_paths_exists():
@@ -160,6 +172,8 @@ def test_paths_exists():
         if not file.get('no_suffix'):
             file_as_path = file.copy()
             file_as_path['url'] = '/' + file_as_path['url']
+            file_as_path['codes'] = conf.expected_file_responses.copy()
+            file_as_path['description'] = file_as_path['description'].replace('file', 'directory')
             dbutils.add_path_to_fetch_queue(file_as_path)
 
     done_paths = []
@@ -185,7 +199,8 @@ def test_paths_exists():
             
             if validpath['url'] == '/' or validpath['url'] in done_paths:
                 continue
-            
+
+            validpath['codes'] = conf.expected_path_responses.copy()
             done_paths.append(validpath['url'])
             
             for path in database.paths:
@@ -193,10 +208,10 @@ def test_paths_exists():
                     continue
                 path = path.copy()
                 path['url'] = validpath['url'] + path['url']
+                path['codes'] = conf.expected_path_responses.copy()
                 dbutils.add_path_to_fetch_queue(path)
 
     textutils.output_info('Found ' + str(len(database.valid_paths)) + ' valid paths')
-
 
 
 def sample_404_from_found_path():
@@ -212,6 +227,7 @@ def sample_404_from_found_path():
             # We don't benchmark / since we do it first before path discovery
             if path_clone['url'] != '/':
                 path_clone['url'] = path_clone['url'] + '/' + random_file + ext
+                path_clone['codes'] = conf.expected_path_responses.copy()
                 # Were not using the fetch cache for 404 sampling
                 database.fetch_queue.put(path_clone)
 
@@ -247,6 +263,7 @@ def add_files_to_paths():
             if filename.get('no_suffix'):
                 new_filename = filename.copy()
                 new_filename['is_file'] = True
+                new_filename['codes'] = conf.expected_file_responses.copy()
 
                 if path['url'] == '/':
                     new_filename['url'] = ''.join([path['url'], filename['url']])
@@ -259,6 +276,7 @@ def add_files_to_paths():
                 for executable_suffix in conf.executables_suffixes:
                     new_filename = filename.copy()
                     new_filename['is_file'] = True
+                    new_filename['codes'] = conf.expected_file_responses.copy()
 
                     if path['url'] == '/':
                         new_filename['url'] = ''.join([path['url'], filename['url'], executable_suffix])
@@ -271,6 +289,7 @@ def add_files_to_paths():
                 for suffix in conf.file_suffixes:
                     new_filename = filename.copy()
                     new_filename['is_file'] = True
+                    new_filename['codes'] = conf.expected_file_responses.copy()
 
                     if path['url'] == '/':
                         new_filename['url'] = ''.join([path['url'], filename['url'], suffix])
@@ -362,7 +381,6 @@ if __name__ == "__main__":
 
     textutils.output_info('Starting Discovery on ' + conf.base_url)
 
-
     # Handle keyboard exit before multi-thread operations
     print_results_worker = None
     try:
@@ -415,20 +433,21 @@ if __name__ == "__main__":
             # Add root to targets
             root_path = conf.path_template.copy()
             root_path['url'] = ''
+            root_path['codes'] = conf.expected_path_responses.copy()
             database.valid_paths.append(root_path)
             load_target_files(running_path)
             load_execute_host_plugins()
             sample_404_from_found_path()
             add_files_to_paths()
             load_execute_file_plugins()
+            # Start print result worker.
+            print_results_worker = SelectedPrintWorker()
+            print_results_worker.daemon = True
             print_results_worker.start()
             # Heuristics
             run_preliminary_file_heuristics()
             textutils.output_info('Probing ' + str(len(database.valid_paths)) + ' files')
             database.messages_output_queue.join()
-            # Start print result worker.
-            print_results_worker = SelectedPrintWorker()
-            print_results_worker.daemon = True
             test_file_exists()
         elif conf.directories_only:
             get_session_cookies()
@@ -436,6 +455,7 @@ if __name__ == "__main__":
             sample_root_404()
             root_path = conf.path_template.copy()
             root_path['url'] = '/'
+            root_path['codes'] = conf.expected_path_responses.copy()
             database.paths.append(root_path)
             database.valid_paths.append(root_path)
             load_execute_host_plugins()
@@ -453,6 +473,7 @@ if __name__ == "__main__":
             # Add root to targets
             root_path = conf.path_template.copy()
             root_path['url'] = '/'
+            root_path['codes'] = conf.expected_path_responses.copy()
             database.paths.append(root_path) 
             load_execute_host_plugins()
         else:
@@ -462,6 +483,7 @@ if __name__ == "__main__":
             # Add root to targets
             root_path = conf.path_template.copy()
             root_path['url'] = '/'
+            root_path['codes'] = conf.expected_path_responses.copy()
             database.paths.append(root_path)
             load_target_paths(running_path)
             load_target_files(running_path)

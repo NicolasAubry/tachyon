@@ -20,11 +20,11 @@ from collections import defaultdict
 
 # Internal config and consts
 name = "delvelabs/tachyon"
-version = '2.2.2'
-expected_path_responses = [200, 206, 401, 403]
-expected_file_responses = [200, 206]
-timeout_codes = [0, 500, 502, 503, 504]
-redirect_codes = [301, 302, 303, 307]
+version = '2.5.0'
+expected_path_responses = {200, 206, 401, 403}
+expected_file_responses = {200, 206}
+timeout_codes = {0, 500, 502, 503, 504}
+redirect_codes = {301, 302, 303, 307}
 file_sample_len = 2048
 
 # Templates, used by plugins
@@ -36,7 +36,7 @@ crafted_404_extensions = ['', '.php', '.jsp', '.asp', '.html', '.rb', '.js', '.p
 # Values used to generate file list (maybe this sould be configurable)
 file_suffixes = ['', '-bak', '-old', '.7z', '.bak', '.cfg', '.cnf', '.conf', '.conf.bak', '.conf.old', '.conf.orig', 
                 '.config', '.csv', '.dmp', '.dump', '.inc', '.inc.old', '.inc.orig', '.ini', '.json', '.log', '.old', 
-                '.passwd', '.php.bak', '.php.inc', '.php.old', '.php.orig', '.properties', '.pwd', '.rar', '.sql', 
+                '.orig', '.passwd', '.php.bak', '.php.inc', '.php.old', '.php.orig', '.properties', '.pwd', '.rar', '.sql', 
                 '.sql.bak', '.sql.old', '.tar', '.tar.bz2', '.tar.gz', '.tgz', '.txt', '.wsdl', '.xml', '.yml', '.zip', 
                 '0', '1', '2', '_log', '~']
 
@@ -75,7 +75,7 @@ allow_download = False
 similarity_ratio = 0.8
 
 # Behavioral tests
-behavior_queue_size = 5
+behavior_queue_size = 15
 max_behavior_tries = 5
 
 plugin_settings = defaultdict(list)

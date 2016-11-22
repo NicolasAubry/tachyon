@@ -29,6 +29,7 @@ def add_path(path):
     current_template['description'] = 'Found in sitemap.xml'
     current_template['is_file'] = False
     current_template['url'] = '/' + path
+    current_template['codes'] = conf.expected_path_responses.copy()
     database.paths.append(current_template)
 
 def add_file(filename):
@@ -36,6 +37,7 @@ def add_file(filename):
     current_template = conf.path_template.copy()
     current_template['description'] = 'Found in sitemap.xml'
     current_template['url'] = filename
+    current_template['codes'] = conf.expected_file_responses.copy()
     database.files.append(current_template)
 
 def execute():
@@ -65,7 +67,10 @@ def execute():
 
         added = 0
         for match in matches:
-            new_path = match.decode().split(conf.target_host)[1]
+            if not isinstance(match, str):
+                match = match.decode('utf-8', 'ignore')
+
+            new_path = match.split(conf.target_host)[1]
 
             # Remove trailing /
             if new_path.endswith('/'):

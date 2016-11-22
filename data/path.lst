@@ -53,6 +53,7 @@
 {"url" : "/cgi-bin", "description" : "Cgi-bin directory", "severity" : "info"}
 {"url" : "/data", "description" : "Static data directory", "severity" : "warning"}
 {"url" : "/database", "description" : "Database directory", "severity" : "medium"}
+{"url" : "/default", "description" : "Default directory", "severity" : "info"}
 {"url" : "/document", "description" : "document directory", "severity" : "warning"}
 {"url" : "/documents", "description" : "document directory", "severity" : "warning"}
 {"url" : "/docs", "description" : "document directory", "severity" : "info"}
@@ -78,6 +79,7 @@
 {"url" : "/forbidden", "description" : "Forbidden directory", "severity" : "info"}
 {"url" : "/groupware", "description" : "Groupware directory", "severity" : "info"}
 {"url" : "/gui", "description" : "GUI / uTorrent Web GUI", "severity" : "info"}
+{"url" : "/htdocs", "description" : "Http documents store", "severity" : "info"}
 {"url" : "/img", "description" : "Images directory", "severity" : "info"}
 {"url" : "/images", "description" : "Images directory", "severity" : "info"}
 {"url" : "/import", "description" : "Import directory", "severity" : "warning"}
@@ -124,6 +126,7 @@
 {"url" : "/secure", "description" : "_Secure_ directory", "severity" : "info"}
 {"url" : "/settings", "description" : "Settings directory", "severity" : "warning"}
 {"url" : "/sites", "description" : "Subsites directory", "severity" : "info"}
+{"url" : "/sites/default", "description" : "Drupal install directory", "severity" : "info"}
 {"url" : "/slimstat", "description" : "SlimStats", "severity" : "warning"}
 {"url" : "/src", "description" : "Source directory", "severity" : "warning"}
 # no leading dot since "." is in auto-prefix
@@ -165,6 +168,7 @@
 {"url" : "/wp-admin", "description" : "Wordpress admin section", "severity" : "info"}
 {"url" : "/xml", "description" : "Static xml directory", "severity" : "info"}
 {"url" : "/webmaster", "description" : "Webmaster directory", "severity" : "info"}
+{"url" : "/webstat", "description" : "Webstat directory", "severity" : "warning"}
 {"url" : "/wp-content", "description" : "Wordpress content directory", "severity" : "info"}
 {"url" : "/wp-content/uploads", "description" : "Wordpress user uploads directory", "severity" : "info"}
 

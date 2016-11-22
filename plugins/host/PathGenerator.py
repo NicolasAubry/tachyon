@@ -27,6 +27,7 @@ def add_generated_path(path):
     current_template['is_file'] = False
     current_template['url'] = '/' + path
     current_template['handle_redirect'] = "ignoreRedirect" not in plugin_settings
+    current_template['codes'] = conf.expected_path_responses.copy()
     database.paths.append(current_template)
     textutils.output_debug(' - PathGenerator Plugin Generated path: ' + str(current_template))
 
@@ -36,6 +37,7 @@ def add_generated_file(file):
     current_template['description'] = 'Computer generated file'
     current_template['url'] = file
     current_template['handle_redirect'] = "ignoreRedirect" not in plugin_settings
+    current_template['codes'] = conf.expected_file_responses.copy()
     database.files.append(current_template)
     textutils.output_debug(' - PathGenerator Plugin Generated file: ' + str(current_template))
 

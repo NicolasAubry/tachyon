@@ -113,7 +113,7 @@
 {"url" : "redis", "description" : "redis monitoring", "severity" : "info"}
 {"url" : "rsync", "description" : "Remote sync file", "severity" : "info"}
 {"url" : "secret", "description" : "Secret file", "severity" : "warning"}
-{"url" : "service", "description" : "Password file", "severity" : "info"}
+{"url" : "service", "description" : "Service file", "severity" : "info"}
 {"url" : "server", "description" : "server file", "severity" : "info"}
 {"url" : "settings", "description" : "settings file", "severity" : "medium"}
 {"url" : "site", "description" : "database backup", "severity" : "info"}
@@ -139,7 +139,7 @@
 {"url" : "json", "description" : "Website API", "severity" : "info"}
 {"url" : "json-api", "description" : "Website API", "severity" : "info"}
 {"url" : "web", "description" : "Web file", "severity" : "warning"}
-
+{"url" : "wp-config", "description" : "Wordpress config file", "severity" : "medium"}
 
 ###
 # No suffix specific files
@@ -254,7 +254,9 @@
 {"url": "docker-compose", "description": "Docker compose config file", "severity" : "medium"}
 {"url": "Dockerfile", "description": "Docker container config", "no_suffix": True, "severity" : "critical"}
 
-
+# sqlite
+{"url" : "db.sqlite", "description" : "Sqlite Database", "no_suffix": True, "severity" : "critical"}
+{"url" : "db.sqlite3", "description" : "Sqlite Database", "no_suffix": True, "severity" : "critical"}
 
 
 

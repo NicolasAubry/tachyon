@@ -20,6 +20,8 @@ try:
 except ImportError:
     from urllib.parse import quote_plus
 
+import uuid
+
 from core import database, textutils, conf
 from difflib import SequenceMatcher
 from core.fetcher import Fetcher
@@ -27,9 +29,12 @@ from core.fetcher import Fetcher
 fetcher = Fetcher()
 
 
-def validate_result(content, url, is_file=False):
-    formatted_content = _get_formatted_content(content, url)
-    return _compare_with_saved_404(formatted_content, is_file)
+def validate_result(response_code, content, headers, queue_item, is_file=False):
+    is_valid = True
+    formatted_content = _get_formatted_content(content, queue_item['url'])
+    is_valid = _compare_with_saved_404(formatted_content, is_file)
+    #is_valid = _test_extensionless_response_code
+    return is_valid
 
 
 def _get_formatted_content(content, url):
@@ -73,39 +78,34 @@ def _compare_with_saved_404(content, is_file):
     return True
 
 
-def _verify_excluded_patterns(url, is_file):
-    """
-    Test if the requested url match an exclusion pattern
-    """
-    pass
-
-
-
 # Test different edge cases
-def test_bogus_source_control_catch():
+def remove_bogus_source_control():
     #.hg #.git
     pass
 
 
-def test_bogus_dot_path_catch():
+def remove_bogus_dot_path():
+    id = str(uuid.uuid4())
+    url = conf.target_base_path + '/.' + id
+
     pass
 
 
-def test_bogus_dash_path_catch():
+def remove_bogus_dash_path():
     pass
 
 
-def test_bogus_tilde_path_catch():
+def remove_bogus_tilde_path():
     pass
 
 
-def test_bogus_apache_dot_files():
+def remove_bogus_apache_dot_files():
     pass
 
 
-def test_bogus_global_dot_files():
+def remove_bogus_global_dot_files():
     pass
 
 
-def test_bogus_forbidden_catch_all():
+def remove_bogus_forbidden():
     pass

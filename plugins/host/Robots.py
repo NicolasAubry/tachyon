@@ -62,6 +62,7 @@ def execute():
 
                 current_template = current_template.copy()
                 current_template['url'] = target_path
+                current_template['codes'] = conf.expected_path_responses.copy()
                 database.paths.append(current_template)
                 textutils.output_debug(' - Robots Plugin Added: ' + str(target_path) + ' from robots.txt')
                 added += 1

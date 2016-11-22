@@ -144,11 +144,14 @@ def test_behavior(content):
     if len(database.behavioral_buffer) >= conf.behavior_queue_size:
         textutils.output_debug('Testing for sameness with bufsize:' + str(len(database.behavioral_buffer)))
         # Check if all results in the buffer are the same
-        same = all(SequenceMatcher(isjunk=None, a=content, b=saved_content, autojunk=False).ratio() > 0.80
+        same = all(SequenceMatcher(isjunk=None, a=content, b=saved_content, autojunk=False).ratio() > 0.95
                    for saved_content in database.behavioral_buffer)
         if same:
             textutils.output_debug('Same!')
             normal = False
+            print(repr(database.behavioral_buffer))
+            print("===========================================================")
+            print(repr(content))
 
     # Kick out only the first item in the queue if the queue is full so we can detect if behavior restores
     if not normal and len(database.behavioral_buffer):
@@ -191,7 +194,7 @@ class FetchCrafted404Worker(Thread):
                 # if timeout count is under max timeout count
                 if response_code is 0 or response_code is 500:
                     handle_timeout(queued, url, self.thread_id, output=self.output)
-                elif response_code in conf.expected_file_responses:
+                elif response_code in queued.get('codes'):
                     # Encoding edge case
                     # Must be a string to be compared to the 404 fingerprint
                     if not isinstance(content, str):
@@ -220,7 +223,7 @@ class FetchCrafted404Worker(Thread):
                             handle_redirects(queued, location)
 
                 # Stats
-                if response_code not in conf.timeout_codes + conf.redirect_codes:
+                if response_code not in conf.timeout_codes.union(conf.redirect_codes):
                     stats.update_processed_items()
                     compute_request_time(start_time, end_time)
 
@@ -288,9 +291,27 @@ class TestPathExistsWorker(Thread):
                         "special": "tomcat-redirect",
                         "severity": queued.get('severity'),
                     })
-                elif response_code in conf.expected_path_responses:
+                elif response_code == 403:
+                    # Add path to valid_path for future actions
+                    database.valid_paths.append(queued)
+                    textutils.output_found('*Forbidden* ' + description + ' at: ' + conf.base_url + url, {
+                        "description": description,
+                        "url": conf.base_url + url,
+                        "code": response_code,
+                        "severity": queued.get('severity'),
+                    })
+
+                elif response_code == 401:
+                    # Output result, but don't keep the url since we can't poke in protected folder
+                    textutils.output_found('Password Protected - ' + description + ' at: ' + conf.base_url + url, {
+                        "description": description,
+                        "url": conf.base_url + url,
+                        "code": response_code,
+                        "severity": queued.get('severity'),
+                    })
+                elif response_code in queued.get('codes'):
                     # Compare content with generated 404 samples
-                    is_valid_result = heuristics.validate_result(content, url)
+                    is_valid_result = heuristics.validate_result(response_code, content, headers, queued)
 
                     if is_valid_result:
                         # Test if behavior is ok.
@@ -337,14 +358,7 @@ class TestPathExistsWorker(Thread):
                             textutils.output_debug('Chances count busted! ' + queued.get('url') +
                                                    ' qsize: ' + str(database.fetch_queue.qsize()))
 
-                    elif response_code == 401:
-                        # Output result, but don't keep the url since we can't poke in protected folder
-                        textutils.output_found('Password Protected - ' + description + ' at: ' + conf.base_url + url, {
-                            "description": description,
-                            "url": conf.base_url + url,
-                            "code": response_code,
-                            "severity": queued.get('severity'),
-                        })
+
                     # At this point, we have a valid result and the behavioral buffer is full.
                     # The behavior of the hit has been taken in account and the app is not in global behavior error
                     elif is_valid_result:
@@ -357,13 +371,6 @@ class TestPathExistsWorker(Thread):
 
                         if response_code == 500:
                             textutils.output_found('ISE, ' + description + ' at: ' + conf.base_url + url, {
-                                "description": description,
-                                "url": conf.base_url + url,
-                                "code": response_code,
-                                "severity": queued.get('severity'),
-                            })
-                        elif response_code == 403:
-                            textutils.output_found('*Forbidden* ' + description + ' at: ' + conf.base_url + url, {
                                 "description": description,
                                 "url": conf.base_url + url,
                                 "code": response_code,
@@ -392,7 +399,7 @@ class TestPathExistsWorker(Thread):
                             handle_redirects(queued, location + url)
 
                 # Stats
-                if response_code not in conf.timeout_codes + conf.redirect_codes:
+                if response_code not in conf.timeout_codes.union(conf.redirect_codes):
                     stats.update_processed_items()
                     compute_request_time(start_time, end_time)
 
@@ -445,9 +452,9 @@ class TestFileExistsWorker(Thread):
                         "code": response_code,
                         "severity": queued.get('severity'),
                     })
-                elif response_code in conf.expected_file_responses:
+                elif response_code in queued.get('codes'):
                     # Test if result is valid
-                    is_valid_result = heuristics.validate_result(content, url, is_file=True)
+                    is_valid_result = heuristics.validate_result(response_code, content, headers, queued, is_file=True)
 
                     if is_valid_result:
                         # Test if behavior is ok.
@@ -468,8 +475,6 @@ class TestFileExistsWorker(Thread):
                             textutils.output_info('Behavior change detected! Results may '
                                                   'be incomplete or tachyon may never exit.')
 
-                            textutils.output_info(repr(database.behavioral_buffer[0]))
-                            textutils.output_info("C404 " + repr(database.crafted_404s))
                             textutils.output_debug('Chances taken: ' + str(queued.get('behavior_chances', 0)))
                             textutils.output_debug(queued.get('url'))
                             database.behavior_error = True
@@ -492,7 +497,6 @@ class TestFileExistsWorker(Thread):
                     elif is_valid_result:
                         # Make sure we base our next analysis on that positive hit
                         reset_behavior_database()
-
                         if len(content) == 0:
                             textutils.output_found('Empty ' + description + ' at: ' + conf.base_url + url, {
                                 "description": "Empty " + description,
@@ -515,12 +519,6 @@ class TestFileExistsWorker(Thread):
                             "string": match_string,
                             "severity": queued.get('severity'),
                     })
-
-                elif response_code in conf.redirect_codes:
-                    if queued.get('handle_redirect', True):
-                        location = headers.get('location')
-                        if location:
-                            handle_redirects(queued, location)
 
                 # Stats
                 if response_code not in conf.timeout_codes:
